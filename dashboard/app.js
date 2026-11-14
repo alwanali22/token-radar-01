@@ -2,7 +2,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const DATA = window.RADAR;
 function renderStats() {
     const s = DATA.counts;
-    document.getElementById('stats').textContent = s.total + ' protocols, ' + s.watchlist + ' watchlist, ' + DATA.rows.length + ' board rows, ' + s.early + ' early, ' + s.live + ' live.';
+    document.getElementById('stats').textContent = s.total + ' protocols, ' + s.watchlist + ' watchlist, ' + DATA.rows.length + ' board rows, ' + s.early + ' early, ' + s.live + ' live, ' + s.excluded + ' excluded.';
 }
 
 const state = { q: '', category: 'all', chain: 'all', watchlistOnly: false, sort: 'rank', tab: 'board', dir: 1 };
@@ -110,6 +110,7 @@ function renderModelPanel() {
     tableHtml += '</table>';
     document.getElementById('model-panel').innerHTML = `
         <p>Formula: Implied = TVL × catMultiple × growthMult × maturityMult × chainMult</p>
+        <p>Wrapped, bridged, staked, and exchange products are excluded from this board because they are not protocols awaiting a token launch; ${DATA.counts.excluded} pre-token protocols are excluded in total.</p>
         ${tableHtml}
         <p>catMultiple: Live FDV/TVL median per category (pre-token haircut: 0.75).</p>
         <p>growthMult: 7d % change impact.</p>
