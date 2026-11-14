@@ -77,6 +77,24 @@ export function ageDays(asOf: string, listedAt: string | null): number | null {
   return Math.max(0, Math.floor((a - b) / 86400000));
 }
 
+export function rankable(p: SnapshotProtocol): boolean {
+  const isPreToken =
+    p.mcap_usd === null && p.gecko_id === null && p.symbol === null;
+
+  return isPreToken
+    && ![
+      'Bridge',
+      'Canonical Bridge',
+      'Liquid Staking',
+      'Liquid Restaking',
+      'Restaked BTC',
+      'CEX',
+    ].includes(p.category)
+    && !/\s(V\d+(\.\d+)?|v\d+(\.\d+)?|\d+\.\d+)$/.test(p.name)
+    && !/\b(wrapped|staked|staking)\b/i.test(p.name)
+    && !/^(Binance|Coinbase|Bybit|Kraken|Bitget|OKX|Bitfinex|Gemini)\b/i.test(p.name);
+}
+
 export function getCatMultiple(category: string | null, protocols: SnapshotProtocol[]): number {
   const liveProtocols = protocols.filter(p => p.mcap_usd !== null && p.category !== null && p.category === category);
   
