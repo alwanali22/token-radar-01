@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Radar</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <header>
+        <h1>Token Radar</h1>
+        <p>Pre-token protocols ranked by model-implied value.</p>
+        <div id="stats"></div>
+    </header>
+    <section id="controls">
+        <input type="text" id="q" placeholder="Search...">
+        <select id="category"><option value="all">All Categories</option></select>
+        <select id="chain"><option value="all">All Chains</option></select>
+        <label><input type="checkbox" id="watchlist-only"> Watchlist</label>
+        <select id="sort">
+            <option value="rank">Sort by Rank</option>
+            <option value="implied">Sort by Implied</option>
+            <option value="tvl">Sort by TVL</option>
+            <option value="7d">Sort by 7d %</option>
+            <option value="age">Sort by Age</option>
+            <option value="name">Sort by Name</option>
+        </select>
+    </section>
+    <div id="tabs">
+        <button id="tab-board" class="active">Board</button>
+        <button id="tab-live">Live tokens (24)</button>
+    </div>
+    <table id="board-table">
+        <thead>
+            <tr id="table-head">
+                <th data-sort="rank">Rank</th>
+                <th data-sort="name">Protocol</th>
+                <th data-sort="category">Category</th>
+                <th data-sort="chain">Chains</th>
+                <th data-sort="tvl">TVL</th>
+                <th data-sort="7d">7d %</th>
+                <th data-sort="age">Age (days)</th>
+                <th data-sort="implied">Implied value</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+    <section id="model-panel"></section>
+    <dialog id="detail-dialog">
+        <button id="close-dialog">Close</button>
+        <div id="dialog-content"></div>
+    </dialog>
+    <footer>
+        <p>Implied value is the entry's own claim, never make.fun's. DefiLlama's record is not proof.</p>
+    </footer>
+    <script src="../data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
