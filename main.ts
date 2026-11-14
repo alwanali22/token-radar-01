@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { calculateImpliedValue, getCatMultiple, generateFarmSteps, ageDays } from './lib/model.ts';
+import { calculateImpliedValue, getCatMultiple, generateFarmSteps, ageDays, rankable } from './lib/model.ts';
 import { buildDossier } from './vendor/makefun-board.ts';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
@@ -11,13 +11,6 @@ function arg(name: string, fallback: string): string {
   if (at >= 0 && at + 1 < process.argv.length) return process.argv[at + 1]!;
   const withEquals = process.argv.find((a) => a.startsWith(`--${name}=`));
   return withEquals === undefined ? fallback : withEquals.slice(name.length + 3);
-}
-
-function isRankable(p: any) {
-  const isPreToken = p.mcap_usd === null && p.gecko_id === null && p.symbol === null;
-  const isNotCEX = p.category !== 'CEX';
-  const nameCheck = !/\s(V\d+|v\d+|2\.0)$/.test(p.name);
-  return isPreToken && isNotCEX && nameCheck;
 }
 
 function run() {
@@ -34,8 +27,11 @@ function run() {
   const snapshot = JSON.parse(readFileSync(inputPath, 'utf8'));
   const { protocols, watchlist, as_of } = snapshot;
   
-  const watchlistProtocols = protocols.filter((p: any) => watchlist.includes(p.slug));
-  const otherRankable = protocols.filter((p: any) => !watchlist.includes(p.slug) && isRankable(p));
+  const watchlistProtocols = protocols.filter((p: any) => watchlist.includes(p.slug) && rankable(p));
+  const otherRankable = protocols.filter((p: any) => !watchlist.includes(p.slug) && rankable(p));
+  const excluded = protocols.filter((p: any) =>
+    p.mcap_usd === null && p.gecko_id === null && p.symbol === null && !rankable(p)
+  ).length;
   
   const allRows = [...watchlistProtocols, ...otherRankable].map(p => {
     const catMultiple = getCatMultiple(p.category, protocols);
@@ -92,7 +88,7 @@ function run() {
     rows: allRows.slice(0, 250), 
     live: liveForData,
     model: { as_of, formula: "TVL * catMultiple * growthMult * maturityMult * chainMult" },
-    counts: { total: protocols.length, watchlist: watchlist.length, board: allRows.length, early: otherRankable.length, live: liveForData.length }
+    counts: { total: protocols.length, watchlist: watchlist.length, board: allRows.length, early: otherRankable.length, live: liveForData.length, excluded }
   }, null, 2)};`);
 
   // Copy dashboard and screenshots
